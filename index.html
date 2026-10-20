@@ -108,13 +108,18 @@
         .card:hover {
             transform: translateY(-5px);
         }
+        
+        /* ESTÁNDAR ÚNICO PARA TODAS LAS IMÁGENES */
         .card img {
             width: 100%;
-            height: 320px;
-            object-fit: cover;
-            background-color: #eee;
+            height: 400px;
+            object-fit: contain;
+            background-color: #ffffff;
+            padding: 10px;
+            box-sizing: border-box;
             cursor: zoom-in;
         }
+
         .card-content {
             padding: 1.2rem;
             display: flex;
@@ -357,7 +362,7 @@
 
                     <div class="card-footer">
                         <span class="price">$6.00</span>
-                        <a href="https://wa.me/593982543871?text=Hola,%20estoy%20interesado%20en%20el%20Rimel%20Mega%20Full%20Size" id="btn-p1" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Rimel%20Mega%20Full%20Size" id="btn-p1" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
                     </div>
                 </div>
             </div>
@@ -385,7 +390,7 @@
 
                     <div class="card-footer">
                         <span class="price">$35.00</span>
-                        <a href="https://wa.me/593982543871?text=Hola,%20estoy%20interesado%20en%20el%20Power%20Bank%20Anker" id="btn-p2" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Power%20Bank%20Anker" id="btn-p2" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
                     </div>
                 </div>
             </div>
@@ -413,7 +418,7 @@
 
                     <div class="card-footer">
                         <span class="price">$30.00</span>
-                        <a href="https://wa.me/593982543871?text=Hola,%20estoy%20interesado%20en%20el%20Perfume%20OHM%20Yanbal" id="btn-p3" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Perfume%20OHM%20Yanbal" id="btn-p3" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
                     </div>
                 </div>
             </div>
@@ -441,10 +446,41 @@
 
                     <div class="card-footer">
                         <span class="price">$15.00</span>
-                        <a href="https://wa.me/593982543871?text=Hola,%20estoy%20interesado%20en%20el%20Sweet%20Black%20Intense%20Cyzone" id="btn-p4" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Sweet%20Black%20Intense%20Cyzone" id="btn-p4" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
                     </div>
                 </div>
             </div>
+
+            <!-- PRODUCTO 5 (PLANTILLA PARA NUEVOS PRODUCTOS - EDITAR AQUÍ) -->
+            <div class="card" data-category="tecnologia" data-name="mouse inalambrico hp 150 ergonomico raton computacion">
+                <img src="img/195161814662.jpg" alt="Mouse Inalámbrico HP 150" class="zoomable">
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Tecnología</span>
+                        <span class="stock-badge available" id="badge-p5">
+                            <i class="fa-solid fa-circle-check"></i> Disponible
+                        </span>
+                    </div>
+                    <h3 class="card-title">Mouse Inalámbrico HP 150</h3>
+                    <p class="card-description">Diseño ergonómico ambidiestro y precisión óptica de 1600 DPI. Conexión inalámbrica 2.4 GHz.</p>
+                    <p class="card-description">Precisión Óptica de 1600 DPI: Sensor de alta precisión que funciona con gran fluidez en la mayoría de superficies.</p>
+                    
+                    <div class="status-toggle-container">
+                        <span>Estado producto:</span>
+                        <label class="switch">
+                            <input type="checkbox" checked onchange="toggleStock('p5', this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="price">$11.00</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Mouse%20Inalambrico%20HP%20150" id="btn-p5" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AGREGAR EL PRODUCTO 6 DEBAJO DE ESTA LÍNEA COPIANDO EL BLOQUE DEL PRODUCTO 5 Y CAMBIANDO 'p5' POR 'p6' -->
 
         </div>
     </div>
@@ -519,12 +555,15 @@
         const spanClose = document.getElementsByClassName("close-modal")[0];
         const zoomableImages = document.getElementsByClassName('zoomable');
 
-        for (let img of zoomableImages) {
-            img.onclick = function(){
-                modal.style.display = "block";
-                modalImg.src = this.src;
+        function setupImageZoom() {
+            for (let img of zoomableImages) {
+                img.onclick = function(){
+                    modal.style.display = "block";
+                    modalImg.src = this.src;
+                }
             }
         }
+        setupImageZoom();
 
         function closeModal() {
             modal.style.display = "none";
