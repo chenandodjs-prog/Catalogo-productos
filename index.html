@@ -1,0 +1,270 @@
+SQL
+-- 1. Tabla de Tiendas (Usuarios/Negocios)
+CREATE TABLE tiendas (
+    id SERIAL PRIMARY KEY,
+    nombre_tienda VARCHAR(100) NOT NULL,
+    slug VARCHAR(50) UNIQUE NOT NULL, -- Ej: 'bazar-novedades' para la URL
+    whatsapp_celular VARCHAR(15) NOT NULL, -- Ej: '593985282615'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2. Tabla de Productos
+CREATE TABLE productos (
+    id SERIAL PRIMARY KEY,
+    tienda_id INT REFERENCES tiendas(id) ON DELETE CASCADE,
+    nombre_producto VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+    precio NUMERIC(10, 2) NOT NULL,
+    imagen_url TEXT,
+    stock INT DEFAULT 10,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>They & Them - Catálogo Digital</title>
+    <!-- Tailwind CSS desde CDN para diseño rápido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para iconos limpios -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen pb-24">
+
+    <!-- CABECERA DE LA TIENDA -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-10">
+        <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">They & Them</h1>
+                <p class="text-xs text-gray-500">Bazar Novedades & Cosmética</p>
+            </div>
+            <!-- Botón del Carrito Flotante superior -->
+            <button onclick="toggleCarrito()" class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+                <i data-lucide="shopping-cart"></i>
+                <span id="badge-carrito" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+            </</button>
+        </div>
+    </header>
+
+    <!-- CUERPO CENTRAL (Simula pantalla de celular) -->
+    <main class="max-w-md mx-auto px-4 py-6 space-y-6">
+        
+        <!-- Banner promocional -->
+        <div class="bg-gradient-to-r class bg-indigo-600 text-white p-4 rounded-2xl shadow-sm">
+            <h3 class="font-bold text-lg">¡Haces tu pedido y pagas en casa! 📦</h3>
+            <p class="text-xs text-indigo-100 mt-1">Envíos rápidos a todo Quito y a nivel nacional.</p>
+        </div>
+
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="sparkles" class="text-amber-500 w-5 h-5"></i> Perfumería Destacada
+        </h2>
+
+        <!-- GRILLA DE PRODUCTOS -->
+        <div id="contenedor-productos" class="grid grid-cols-2 gap-4">
+            <!-- Los productos se cargan dinámicamente con JavaScript -->
+        </div>
+    </main>
+
+    <!-- BARRA INFERIOR FLOTANTE (Solo aparece si hay items en el carrito) -->
+    <div id="barra-flotante" class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 hidden z-20">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <p class="text-xs text-gray-500">Total acumulado</p>
+                <p id="total-barra" class="text-lg font-bold text-gray-800">$0.00</p>
+            </div>
+            <button onclick="toggleCarrito()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-md hover:bg-indigo-700 transition">
+                Ver mi Pedido <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DEL CARRITO DE COMPRAS OVERLAY -->
+    <div id="modal-carrito" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full flex flex-col p-6 animate-slide-in">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="text-indigo-600"></i> Tu Carrito
+                </h3>
+                <button onclick="toggleCarrito()" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Lista de items agregados -->
+            <div id="items-carrito" class="flex-1 overflow-y-auto py-4 space-y-4">
+                <!-- Se inyecta con JS -->
+            </div>
+
+            <!-- Formulario de datos de entrega -->
+            <div class="border-t pt-4 space-y-3">
+                <h4 class="font-semibold text-sm text-gray-700">Datos para la entrega:</h4>
+                <input type="text" id="nombre-cliente" placeholder="Tu Nombre y Apellido" class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="text" id="direccion-cliente" placeholder="Dirección exacta en Quito / Provincia" class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                
+                <div class="flex justify-between items-center py-2">
+                    <span class="font-bold text-gray-700">Total a pagar:</span>
+                    <span id="total-modal" class="text-xl font-black text-gray-900">$0.00</span>
+                </div>
+
+                <!-- BOTÓN MÁGICO: REDIRECCIÓN A WHATSAPP -->
+                <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-emerald-700 transition shadow-md shadow-emerald-100">
+                    <i data-lucide="phone" class="w-5 h-5"></i> Confirmar Pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LÓGICA DE PROGRAMACIÓN (JAVASCRIPT) -->
+    <script>
+        // Número de WhatsApp al que llegarán los pedidos (Formato internacional sin el +)
+        const WHATSAPP_CONFIG = "593985282615"; 
+
+        // Base de datos simulada de tus productos
+        const baseDeDatos = [
+            { id: 1, nombre: "Ohm Black (Yanbal)", precio: 32.00, imagen: "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=300&q=80", desc: "100ml. Elegancia maderosa y cuero." },
+            { id: 2, nombre: "Dendur (Yanbal)", precio: 28.50, imagen: "https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=300&q=80", desc: "75ml. Aroma oriental con pimienta negra." },
+            { id: 3, nombre: "Absolute by Exclusive (Avon)", precio: 25.00, imagen: "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=300&q=80", desc: "100ml. Maderas exóticas de Oud." },
+            { id: 4, nombre: "Zentro (Ésika)", precio: 30.00, imagen: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=300&q=80", desc: "75ml. Ámbar especiado y Yuzu cítrico." }
+        ];
+
+        let carrito = [];
+
+        // Inicializar los iconos de Lucide
+        lucide.createIcons();
+
+        // Renderizar productos en la grilla
+        function cargarProductos() {
+            const contenedor = document.getElementById('contenedor-productos');
+            contenedor.innerHTML = baseDeDatos.map(prod => `
+                <div class="bg-white border rounded-2xl p-3 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+                    <img src="${prod.imagen}" alt="${prod.nombre}" class="w-full h-32 object-cover rounded-xl bg-gray-100">
+                    <div class="mt-2 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-sm text-gray-800 line-clamp-1">${prod.nombre}</h3>
+                            <p class="text-[11px] text-gray-400 line-clamp-2 mt-0.5">${prod.desc}</p>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="font-black text-indigo-600 text-sm">$${prod.precio.toFixed(2)}</span>
+                            <button onclick="agregarAlCarrito(${prod.id})" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 rounded-xl transition">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons(); // Re-renderizar iconos inyectados
+        }
+
+        // Acciones del Carrito
+        function agregarAlCarrito(id) {
+            const itemExistente = carrito.find(item => item.id === id);
+            if (itemExistente) {
+                itemExistente.cantidad++;
+            } else {
+                const prod = baseDeDatos.find(p => p.id === id);
+                carrito.push({ ...prod, cantidad: 1 });
+            }
+            actualizarInterfaz();
+        }
+
+        function cambiarCantidad(id, cambio) {
+            const item = carrito.find(item => item.id === id);
+            if (item) {
+                item.cantidad += cambio;
+                if (item.cantidad <= 0) {
+                    carrito = carrito.filter(i => i.id !== id);
+                }
+            }
+            actualizarInterfaz();
+        }
+
+        function actualizarInterfaz() {
+            // Contar total de items
+            const totalItems = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+            const totalDinero = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+            // Actualizar Badges y Totales
+            const badge = document.getElementById('badge-carrito');
+            if(totalItems > 0) {
+                badge.innerText = totalItems;
+                badge.classList.remove('hidden');
+                document.getElementById('barra-flotante').classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                document.getElementById('barra-flotante').classList.add('hidden');
+                document.getElementById('modal-carrito').classList.add('hidden');
+            }
+
+            document.getElementById('total-barra').innerText = `$${totalDinero.toFixed(2)}`;
+            document.getElementById('total-modal').innerText = `$${totalDinero.toFixed(2)}`;
+
+            // Renderizar items dentro del modal del carrito
+            const contenedorItems = document.getElementById('items-carrito');
+            if (carrito.length === 0) {
+                contenedorItems.innerHTML = `<p class="text-center text-sm text-gray-400 py-8">Tu carrito está vacío.</p>`;
+            } else {
+                contenedorItems.innerHTML = carrito.map(item => `
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.imagen}" class="w-12 h-12 object-cover rounded-lg">
+                            <div>
+                                <h5 class="font-bold text-xs text-gray-800">${item.nombre}</h5>
+                                <p class="text-xs text-indigo-600 font-semibold">$${(item.precio * item.cantidad).toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-white border rounded-lg px-2 py-1">
+                            <button onclick="cambiarCantidad(${item.id}, -1)" class="text-gray-500 hover:text-red-500 font-bold text-sm px-1">-</button>
+                            <span class="text-xs font-bold w-4 text-center">${item.cantidad}</span>
+                            <button onclick="cambiarCantidad(${item.id}, 1)" class="text-gray-500 hover:text-indigo-500 font-bold text-sm px-1">+</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleCarrito() {
+            const modal = document.getElementById('modal-carrito');
+            modal.classList.toggle('hidden');
+        }
+
+        // CONSTRUCCIÓN DEL MENSAJE DINÁMICO DE WHATSAPP
+        function enviarPedidoWhatsApp() {
+            const nombre = document.getElementById('nombre-cliente').value.trim();
+            const direccion = document.getElementById('direccion-cliente').value.trim();
+
+            if (!nombre || !direccion) {
+                alert("Por favor, ingresa tu nombre y dirección para coordinar la entrega.");
+                return;
+            }
+
+            // Construir el texto con formato amigable
+            let texto = `🛍️ *NUEVO PEDIDO - THEY & THEM*\n\n`;
+            texto += `👤 *Cliente:* ${nombre}\n`;
+            texto += `📍 *Dirección:* ${direccion}\n\n`;
+            texto += `🛒 *Detalle de la compra:*\n`;
+
+            carrito.forEach(item => {
+                texto += `• ${item.cantidad}x ${item.nombre} (_$${item.precio.toFixed(2)} c/u_)\n`;
+            });
+
+            const totalDinero = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+            texto += `\n💰 *Total a pagar:* $${totalDinero.toFixed(2)}\n\n`;
+            texto += `📦 _Por favor, confírmame los datos para el despacho._`;
+
+            // Codificar el texto para URL de WhatsApp
+            const textoCodificado = encodeURIComponent(texto);
+            const urlWhatsApp = `https://wa.me/${WHATSAPP_CONFIG}?text=${textoCodificado}`;
+
+            // Redireccionar al usuario a la app de WhatsApp
+            window.open(urlWhatsApp, '_blank');
+        }
+
+        // Ejecutar carga inicial
+        cargarProductos();
+    </script>
+</body>
+</html>
