@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo - They & Them Bazar Novedades</title>
-    <!-- Iconos de FontAwesome para las categorías -->
+    <!-- Iconos de FontAwesome para las categorías y modal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -108,16 +108,44 @@
         .card:hover {
             transform: translateY(-5px);
         }
-        
-        /* ESTÁNDAR ÚNICO PARA TODAS LAS IMÁGENES */
-        .card img {
+
+        /* CONTENEDOR DE IMAGEN CON LUPA OVERLAY */
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+        .card-img-wrapper img.zoomable {
             width: 100%;
             height: 250px;
             object-fit: contain;
-            background-color: #ffffff;
             padding: 10px;
             box-sizing: border-box;
-            cursor: zoom-in;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .card-img-wrapper:hover img.zoomable {
+            transform: scale(1.05);
+        }
+        .zoom-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(44, 62, 80, 0.7);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.8;
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+        .card-img-wrapper:hover .zoom-overlay {
+            opacity: 1;
+            background-color: var(--cat-active);
         }
 
         .card-content {
@@ -209,40 +237,57 @@
             margin-top: 3rem;
         }
 
-        /* MODAL DE IMAGEN */
+        /* MODAL DE IMAGEN (AMPLIACIÓN CON LUPA) */
         .image-modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            padding-top: 50px;
+            z-index: 2000;
+            padding-top: 40px;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.9);
-            cursor: zoom-out;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
         }
         .image-modal-content {
             margin: auto;
             display: block;
             max-width: 90%;
-            max-height: 85vh;
-            border-radius: 5px;
-            animation: zoom 0.3s;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            animation: zoomAnimation 0.3s ease-in-out;
+        }
+        #modalCaption {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+            text-align: center;
+            color: #fff;
+            padding: 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
         .close-modal {
             position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
+            top: 20px;
+            right: 30px;
+            color: #fff;
+            font-size: 35px;
             font-weight: bold;
             cursor: pointer;
+            transition: color 0.2s;
         }
-        @keyframes zoom {
-            from {transform: scale(0)}
-            to {transform: scale(1)}
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+
+        @keyframes zoomAnimation {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
@@ -287,13 +332,14 @@
             
             <!-- PRODUCTO 1: COSMÉTICOS -->
             <div class="card" data-category="cosmeticos" data-name="rimel mega full size esika maquillaje cosmetico">
-                <img src="img/3212.jpg" alt="Rimel Mega Full Size" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3212.jpg', 'Rímel Mega Full Size')">
+                    <img src="img/3212.jpg" alt="Rimel Mega Full Size" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Cosméticos</span>
-                        <span class="stock-badge available">
-                            <i class="fa-solid fa-circle-check"></i> Disponible
-                        </span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
                     </div>
                     <h3 class="card-title">Rímel Mega Full Size</h3>
                     <p class="card-description">Efecto de largo extremo de raíz a punta. Fórmula ligera en gel.</p>
@@ -306,13 +352,14 @@
 
             <!-- PRODUCTO 2: TECNOLOGÍA -->
             <div class="card" data-category="tecnologia" data-name="power bank anker 20000mah cargador bateria">
-                <img src="img/194644127640.jpg" alt="Power Bank Anker" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/194644127640.jpg', 'Power Bank Anker 20000mAh')">
+                    <img src="img/194644127640.jpg" alt="Power Bank Anker" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Tecnología</span>
-                        <span class="stock-badge available">
-                            <i class="fa-solid fa-circle-check"></i> Disponible
-                        </span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
                     </div>
                     <h3 class="card-title">Power Bank Anker 20000mAh</h3>
                     <p class="card-description">Carga rápida portátil ideal para mantener tus dispositivos encendidos todo el día. Cuenta con 3 salidas.</p>
@@ -325,13 +372,14 @@
 
             <!-- PRODUCTO 3: PERFUMES HOMBRE (OHM) -->
             <div class="card" data-category="perfumes hombre" data-name="perfume ohm yanbal hombre colonia">
-                <img src="img/3192.jpg" alt="Perfume OHM Yanbal" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3192.jpg', 'Perfume OHM Yanbal')">
+                    <img src="img/3192.jpg" alt="Perfume OHM Yanbal" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
-                        <span class="stock-badge available">
-                            <i class="fa-solid fa-circle-check"></i> Disponible
-                        </span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
                     </div>
                     <h3 class="card-title">Perfume OHM Yanbal</h3>
                     <p class="card-description">Perfume para hombre herbal cítrico con notas de toronja rosada, salvia y cuero.</p>
@@ -344,13 +392,14 @@
 
             <!-- PRODUCTO 4: PERFUMES MUJER (SWEET BLACK INTENSE) -->
             <div class="card" data-category="perfumes mujer" data-name="sweet black intense cyzone perfume colonia mujer">
-                <img src="img/3709.jpg" alt="Sweet Black Intense Cyzone" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3709.jpg', 'SWEET BLACK INTENSE 50ML CYZONE')">
+                    <img src="img/3709.jpg" alt="Sweet Black Intense Cyzone" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Mujer</span>
-                        <span class="stock-badge available">
-                            <i class="fa-solid fa-circle-check"></i> Disponible
-                        </span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
                     </div>
                     <h3 class="card-title">SWEET BLACK INTENSE 50ML CYZONE</h3>
                     <p class="card-description">Fragancia femenina perteneciente a la familia olfativa Oriental Amaderada (oriental dulce).</p>
@@ -363,13 +412,14 @@
 
             <!-- PRODUCTO 5: TECNOLOGÍA (MOUSE HP) -->
             <div class="card" data-category="tecnologia" data-name="mouse inalambrico hp 150 ergonomico raton computacion">
-                <img src="img/195161814662.jpg" alt="Mouse Inalámbrico HP 150" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/195161814662.jpg', 'Mouse Inalámbrico HP 150')">
+                    <img src="img/195161814662.jpg" alt="Mouse Inalámbrico HP 150" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Tecnología</span>
-                        <span class="stock-badge available">
-                            <i class="fa-solid fa-circle-check"></i> Disponible
-                        </span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
                     </div>
                     <h3 class="card-title">Mouse Inalámbrico HP 150</h3>
                     <p class="card-description">Diseño ergonómico ambidiestro y precisión óptica de 1600 DPI. Conexión inalámbrica 2.4 GHz.</p>
@@ -382,7 +432,10 @@
 
             <!-- PRODUCTO 6: PROTECTOR SOLAR TOTAL BLOCK -->
             <div class="card" data-category="protector solar" data-name="protector solar jumbo total block 140g yanbal bloqueador">
-                <img src="img/0013517.jpg" alt="PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0013517.jpg', 'PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G')">
+                    <img src="img/0013517.jpg" alt="PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PROTECTOR SOLAR</span>
@@ -399,7 +452,10 @@
 
             <!-- PRODUCTO 7: PROTECTOR SOLAR KIDS -->
             <div class="card" data-category="protector solar" data-name="total block protector solar kids spf 100 140g">
-                <img src="img/0013520.jpg" alt="Total Block Protector Solar Kids SPF 100 140g" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0013520.jpg', 'Total Block Protector Solar Kids SPF 100 140g')">
+                    <img src="img/0013520.jpg" alt="Total Block Protector Solar Kids SPF 100 140g" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PROTECTOR SOLAR</span>
@@ -416,7 +472,10 @@
 
             <!-- PRODUCTO 8: PERFUMES HOMBRE (DENDUR) -->
             <div class="card" data-category="perfumes hombre" data-name="dendur 75ml yanbal hombre perfume colonia">
-                <img src="img/0013697.jpg" alt="DENDUR 75ML YAMBAL H" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0013697.jpg', 'DENDUR 75ML YAMBAL H')">
+                    <img src="img/0013697.jpg" alt="DENDUR 75ML YAMBAL H" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -433,7 +492,10 @@
 
             <!-- PRODUCTO 9: PERFUMES HOMBRE (OSADIA LIMITED EDITION) -->
             <div class="card" data-category="perfumes hombre" data-name="osadia limited edition 75ml yanbal hombre perfume">
-                <img src="img/0014191.jpg" alt="OSADIA LIMITED EDITION 75ML YAMBAL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0014191.jpg', 'OSADIA LIMITED EDITION 75ML YAMBAL')">
+                    <img src="img/0014191.jpg" alt="OSADIA LIMITED EDITION 75ML YAMBAL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -450,7 +512,10 @@
 
             <!-- PRODUCTO 10: PERFUMES HOMBRE (ZENTRO) -->
             <div class="card" data-category="perfumes hombre" data-name="zentro 75ml yanbal hombre perfume colonia">
-                <img src="img/0012788.jpg" alt="ZENTRO 75ML YAMBAL H" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0012788.jpg', 'ZENTRO 75ML YAMBAL H')">
+                    <img src="img/0012788.jpg" alt="ZENTRO 75ML YAMBAL H" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -467,7 +532,10 @@
 
             <!-- PRODUCTO 11: PERFUMES HOMBRE (L'ATTRACTION) -->
             <div class="card" data-category="perfumes hombre" data-name="l'attraction 100ml l'bel hombre perfume colonia">
-                <img src="img/3503.jpg" alt="L´ATTRACTION 100ML L´BEL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3503.jpg', 'L´ATTRACTION 100ML L´BEL')">
+                    <img src="img/3503.jpg" alt="L´ATTRACTION 100ML L´BEL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -484,7 +552,10 @@
 
             <!-- PRODUCTO 12: PERFUMES HOMBRE (KALOS SPORT) -->
             <div class="card" data-category="perfumes hombre" data-name="kalos sport 100ml esika hombre perfume colonia">
-                <img src="img/3502.jpg" alt="KALOS SPORT 100ML ESIKA" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3502.jpg', 'KALOS SPORT 100ML ESIKA')">
+                    <img src="img/3502.jpg" alt="KALOS SPORT 100ML ESIKA" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -501,7 +572,10 @@
 
             <!-- PRODUCTO 13: PERFUMES HOMBRE (ALL BLACK) -->
             <div class="card" data-category="perfumes hombre" data-name="all black 90ml cyzone hombre perfume colonia">
-                <img src="img/3707.jpg" alt="ALL BLACK 90ML CYZONE" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3707.jpg', 'ALL BLACK 90ML CYZONE')">
+                    <img src="img/3707.jpg" alt="ALL BLACK 90ML CYZONE" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -518,7 +592,10 @@
 
             <!-- PRODUCTO 14: PERFUMES HOMBRE (D'ORSAY GRAND) -->
             <div class="card" data-category="perfumes hombre" data-name="d'orsay grand 90ml esika hombre perfume colonia">
-                <img src="img/3969.jpg" alt="D´ORSAY GRAND 90ML ESIKA" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3969.jpg', 'D´ORSAY GRAND 90ML ESIKA')">
+                    <img src="img/3969.jpg" alt="D´ORSAY GRAND 90ML ESIKA" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -535,7 +612,10 @@
 
             <!-- PRODUCTO 15: PERFUMES HOMBRE (BLUE NIGHT) -->
             <div class="card" data-category="perfumes hombre" data-name="blue night 100ml lbel hombre perfume colonia">
-                <img src="img/3459.jpg" alt="BLUE NIGHT 100ML LBEL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3459.jpg', 'BLUE NIGHT 100ML LBEL')">
+                    <img src="img/3459.jpg" alt="BLUE NIGHT 100ML LBEL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -552,7 +632,10 @@
 
             <!-- PRODUCTO 16: PERFUMES HOMBRE (FORZE) -->
             <div class="card" data-category="perfumes hombre" data-name="forze 50ml cyzone hombre perfume colonia">
-                <img src="img/3967.jpg" alt="FORZE 50ML CYZONE" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3967.jpg', 'FORZE 50ML CYZONE')">
+                    <img src="img/3967.jpg" alt="FORZE 50ML CYZONE" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -569,7 +652,10 @@
 
             <!-- PRODUCTO 17: PERFUMES HOMBRE (BLUE INFINITE) -->
             <div class="card" data-category="perfumes hombre" data-name="blue infinite lbel 100ml hombre perfume colonia">
-                <img src="img/3966.jpg" alt="BLUE INFINITE LBRL 100ML" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/3966.jpg', 'BLUE INFINITE LBRL 100ML')">
+                    <img src="img/3966.jpg" alt="BLUE INFINITE LBRL 100ML" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">Perfumes Hombre</span>
@@ -586,7 +672,10 @@
 
             <!-- PRODUCTO 18: DULCE AMISTAD -->
             <div class="card" data-category="perfumes mujer" data-name="dulce amistad 50ml yambal m">
-                <img src="img/0013203.jpg" alt="DULCE AMISTAD 50ML YAMBAL M" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/13203.jpg', 'DULCE AMISTAD 50ML YAMBAL M')">
+                    <img src="img/13203.jpg" alt="DULCE AMISTAD 50ML YAMBAL M" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PERFUMES MUJER</span>
@@ -603,7 +692,10 @@
 
             <!-- PRODUCTO 19: CIELO -->
             <div class="card" data-category="perfumes mujer" data-name="cielo 50ml yambal">
-                <img src="img/0013641.jpg" alt="CIELO 50ML YAMBAL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0013641.jpg', 'CIELO 50ML YAMBAL')">
+                    <img src="img/0013641.jpg" alt="CIELO 50ML YAMBAL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PERFUMES MUJER</span>
@@ -620,7 +712,10 @@
 
             <!-- PRODUCTO 20: OSADIA ROJO -->
             <div class="card" data-category="perfumes mujer" data-name="osadia rojo 50ml yambal">
-                <img src="img/0013197.jpg" alt="OSADIA ROJO 50ML YAMBAL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0013197.jpg', 'OSADIA ROJO 50ML YAMBAL')">
+                    <img src="img/0013197.jpg" alt="OSADIA ROJO 50ML YAMBAL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PERFUMES MUJER</span>
@@ -637,7 +732,10 @@
 
             <!-- PRODUCTO 21: OSADIA LIMITED EDITION -->
             <div class="card" data-category="perfumes mujer" data-name="osadia limited edition 50ml yambal">
-                <img src="img/0014190.jpg" alt="OSADIA LIMITED EDITION 50ML YAMBAL" class="zoomable">
+                <div class="card-img-wrapper" onclick="openModal('img/0014190.jpg', 'OSADIA LIMITED EDITION 50ML YAMBAL')">
+                    <img src="img/0014190.jpg" alt="OSADIA LIMITED EDITION 50ML YAMBAL" class="zoomable">
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
                 <div class="card-content">
                     <div class="card-header-tags">
                         <span class="card-badge">PERFUMES MUJER</span>
@@ -652,12 +750,72 @@
                 </div>
             </div>
 
-        </div> <!-- CIERRE DE GRID -->
-    </div> <!-- CIERRE DE CONTAINER -->
+        </div>
+    </div>
+
+    <!-- VENTANA MODAL PARA AMPLIR IMAGEN CON LA LUPA -->
+    <div id="imageModal" class="image-modal" onclick="closeModal()">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img class="image-modal-content" id="imgExpanded">
+        <div id="modalCaption"></div>
+    </div>
 
     <footer>
         <p>&copy; 2026 They & Them Bazar Novedades - Guajaló, Quito</p>
     </footer>
 
+    <!-- SCRIPT PARA FILTRAR Y MANEJAR EL MODAL/LUPA -->
+    <script>
+        // Funciones del Filtro de Categoría
+        function filterCategory(category, buttonElement) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+
+            const cards = document.querySelectorAll('.grid .card');
+            cards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                if (category === 'todos' || cardCategory === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Funciones de Búsqueda
+        function filterProducts() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.querySelectorAll('.grid .card');
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name') || '';
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const description = card.querySelector('.card-description').textContent.toLowerCase();
+
+                if (name.includes(filter) || title.includes(filter) || description.includes(filter)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Funciones para la Lupa (Abrir y Cerrar Modal de Imagen)
+        function openModal(imageSrc, titleText) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("imgExpanded");
+            const captionText = document.getElementById("modalCaption");
+            
+            modal.style.display = "block";
+            modalImg.src = imageSrc;
+            captionText.innerHTML = titleText;
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+    </script>
 </body>
 </html>
