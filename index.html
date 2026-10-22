@@ -90,43 +90,59 @@
             box-shadow: 0 4px 10px rgba(142, 68, 173, 0.25);
         }
 
-        /* GRID DE PRODUCTOS */
+        /* GRID DE PRODUCTOS ESTÁNDAR */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
         }
         .card {
-            background: rgba(252, 249, 251, 0.9);
-            border-radius: 10px;
+            background: #ffffff;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
         }
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
 
-        /* CONTENEDOR DE IMAGEN CON LUPA OVERLAY */
+        /* CONTENEDOR DE IMAGEN Y CARRUSEL MULTI-IMAGEN */
         .card-img-wrapper {
             position: relative;
+            width: 100%;
+            height: 240px; /* Altura fija estricta para evitar distorsión */
             overflow: hidden;
-            cursor: pointer;
             background-color: #ffffff;
         }
-        .card-img-wrapper img.zoomable {
+        .card-gallery-wrapper {
+            display: flex;
             width: 100%;
-            height: 250px;
-            object-fit: contain;
-            padding: 10px;
-            box-sizing: border-box;
-            display: block;
-            transition: transform 0.3s ease;
+            height: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
-        .card-img-wrapper:hover img.zoomable {
-            transform: scale(1.05);
+        .card-gallery-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+        .card-gallery-wrapper {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .card-gallery-wrapper img.zoomable {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Estandariza la foto sin estirar ni deformar */
+            scroll-snap-align: start;
+            display: block;
+            cursor: pointer;
         }
         .zoom-overlay {
             position: absolute;
@@ -141,18 +157,46 @@
             justify-content: center;
             align-items: center;
             opacity: 0.8;
+            pointer-events: none;
             transition: opacity 0.3s, background-color 0.3s;
+            z-index: 3;
         }
         .card-img-wrapper:hover .zoom-overlay {
             opacity: 1;
             background-color: var(--cat-active);
         }
 
+        /* FLECHAS DE NAVEGACIÓN PARA MÚLTIPLES FOTOS */
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 4;
+            transition: background 0.2s;
+        }
+        .gallery-nav:hover {
+            background: #ffffff;
+            color: var(--cat-active);
+        }
+        .gallery-nav.prev { left: 8px; }
+        .gallery-nav.next { right: 8px; }
+
         .card-content {
             padding: 1.2rem;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            justify-content: space-between;
         }
         
         /* TAGS Y ESTADO STOCK */
@@ -184,13 +228,13 @@
             background-color: #e8f8f0;
             color: var(--success-color);
         }
-        .stock-badge.unavailable {
+        .stock-badge.unavailable, .stock-badge.out-of-stock {
             background-color: #fdeaea;
             color: var(--danger-color);
         }
 
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             margin: 0.3rem 0;
             color: var(--primary-color);
         }
@@ -198,6 +242,7 @@
             font-size: 0.9rem;
             color: #666;
             margin-bottom: 0.6rem;
+            line-height: 1.4;
         }
 
         .card-footer {
@@ -216,7 +261,7 @@
             background-color: #25d366;
             color: white;
             padding: 0.5rem 0.9rem;
-            border-radius: 5px;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
             font-size: 0.85rem;
@@ -237,7 +282,7 @@
             margin-top: 3rem;
         }
 
-        /* MODAL DE IMAGEN (AMPLIACIÓN CON LUPA) */
+        /* MODAL DE IMAGEN (AMPLIACIÓN) */
         .image-modal {
             display: none;
             position: fixed;
@@ -259,6 +304,7 @@
             border-radius: 8px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.5);
             animation: zoomAnimation 0.3s ease-in-out;
+            object-fit: contain;
         }
         #modalCaption {
             margin: auto;
@@ -332,8 +378,10 @@
             
             <!-- PRODUCTO 1: COSMÉTICOS -->
             <div class="card" data-category="cosmeticos" data-name="rimel mega full size esika maquillaje cosmetico">
-                <div class="card-img-wrapper" onclick="openModal('img/3212.jpg', 'Rímel Mega Full Size')">
-                    <img src="img/3212.jpg" alt="Rimel Mega Full Size" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3212.jpg" alt="Rimel Mega Full Size" class="zoomable" onclick="openModal('img/3212.jpg', 'Rímel Mega Full Size')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -352,8 +400,10 @@
 
             <!-- PRODUCTO 2: TECNOLOGÍA -->
             <div class="card" data-category="tecnologia" data-name="power bank anker 20000mah cargador bateria">
-                <div class="card-img-wrapper" onclick="openModal('img/194644127640.jpg', 'Power Bank Anker 20000mAh')">
-                    <img src="img/194644127640.jpg" alt="Power Bank Anker" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/194644127640.jpg" alt="Power Bank Anker" class="zoomable" onclick="openModal('img/194644127640.jpg', 'Power Bank Anker 20000mAh')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -372,8 +422,10 @@
 
             <!-- PRODUCTO 3: PERFUMES HOMBRE (OHM) -->
             <div class="card" data-category="perfumes hombre" data-name="perfume ohm yanbal hombre colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3192.jpg', 'Perfume OHM Yanbal')">
-                    <img src="img/3192.jpg" alt="Perfume OHM Yanbal" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3192.jpg" alt="Perfume OHM Yanbal" class="zoomable" onclick="openModal('img/3192.jpg', 'Perfume OHM Yanbal')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -392,8 +444,10 @@
 
             <!-- PRODUCTO 4: PERFUMES MUJER (SWEET BLACK INTENSE) -->
             <div class="card" data-category="perfumes mujer" data-name="sweet black intense cyzone perfume colonia mujer">
-                <div class="card-img-wrapper" onclick="openModal('img/3709.jpg', 'SWEET BLACK INTENSE 50ML CYZONE')">
-                    <img src="img/3709.jpg" alt="Sweet Black Intense Cyzone" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3709.jpg" alt="Sweet Black Intense Cyzone" class="zoomable" onclick="openModal('img/3709.jpg', 'SWEET BLACK INTENSE 50ML CYZONE')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -410,10 +464,452 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 5: TECNOLOGÍA (MOUSE HP) -->
+            <!-- PERFUMES MUJER (DULCE AMISTAD) -->
+            <div class="card" data-category="perfumes mujer" data-name="dulce amistad 50ml yambal m perfume mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013203.jpg" alt="DULCE AMISTAD 50ML YAMBAL M" class="zoomable" onclick="openModal('img/0013203.jpg', 'DULCE AMISTAD 50ML YAMBAL M')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">DULCE AMISTAD 50ML YAMBAL</h3>
+                    <p class="card-description">Fragancia femenina de 50 ml. Su aroma combina notas frutales y florales con un fondo dulce de frambuesa, flor de cerezo y helado de vainilla[cite: 1].</p>
+                    <div class="card-footer">
+                        <span class="price">$23.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Dulce%20Amistad%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERFUMES MUJER (CIELO) -->
+            <div class="card" data-category="perfumes mujer" data-name="cielo 50ml yambal perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013641.jpg" alt="CIELO 50ML YAMBAL" class="zoomable" onclick="openModal('img/0013641.jpg', 'CIELO 50ML YAMBAL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">CIELO 50ML YAMBAL</h3>
+                    <p class="card-description">El Cielo de Yanbal (50 ml) es un emblemático Eau de Parfum para mujer con un aroma floral ambarado. Combina notas de jazmín, flor de loto fresca y musk[cite: 1].</p>
+                    <div class="card-footer">
+                        <span class="price">$27.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Cielo%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERFUMES MUJER (OSADIA ROJO) -->
+            <div class="card" data-category="perfumes mujer" data-name="osadia rojo 50ml yambal perfume mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013197.jpg" alt="OSADIA ROJO 50ML YAMBAL" class="zoomable" onclick="openModal('img/0013197.jpg', 'OSADIA ROJO 50ML YAMBAL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">OSADIA ROJO 50ML YAMBAL</h3>
+                    <p class="card-description">Fragancia femenina de alta intensidad con un aroma floral frutal. Destaca por notas de granada, flor de maracuyá y jengibre[cite: 1].</p>
+                    <div class="card-footer">
+                        <span class="price">$27.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Osadia%20Rojo%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERFUMES MUJER (OSADIA LIMITED EDITION MUJER) -->
+            <div class="card" data-category="perfumes mujer" data-name="osadia limited edition 50ml yambal perfume mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0014190.jpg" alt="OSADIA LIMITED EDITION 50ML YAMBAL" class="zoomable" onclick="openModal('img/0014190.jpg', 'OSADIA LIMITED EDITION 50ML YAMBAL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">OSADIA LIMITED EDITION 50ML YAMBAL</h3>
+                    <p class="card-description">Fragancia de alta intensidad en versión para mujer (frutal floral de 50 ml con granada, flor de maracuyá y jengibre), para personalidades audaces[cite: 1].</p>
+                    <div class="card-footer">
+                        <span class="price">$27.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Osadia%20Limited%20Edition%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CCORI RUBI 50ML YAMBAL -->
+            <div class="card" data-category="perfumes mujer" data-name="ccori rubi 50ml yambal perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0014215.jpg" alt="CCORI RUBI 50ML YAMBAL" class="zoomable" onclick="openModal('img/0014215.jpg', 'CCORI RUBI 50ML YAMBAL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">CCORI RUBI 50ML YAMBAL</h3>
+                    <p class="card-description">Perfume femenino de la familia olfativa ámbar floral, intenso, sofisticado y altamente sensual. Combina el concepto del oro con el rubí[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$28.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Ccori%20Rubi%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REVE SENSUELLE 50ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="reve sensuelle 50ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3983.jpg" alt="REVE SENSUELLE 50ML L'BEL" class="zoomable" onclick="openModal('img/3983.jpg', 'REVE SENSUELLE 50ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">REVE SENSUELLE 50ML L'BEL</h3>
+                    <p class="card-description">Perfume para mujer de la familia oriental dulce amaderada. Destaca por su alta concentración aromática y gran fijación[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$24.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Reve%20Sensuelle%2050ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HYPNOTISANT 50ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="hypnotisant 50ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3984.jpg" alt="HYPNOTISANT 50ML L'BEL" class="zoomable" onclick="openModal('img/3984.jpg', 'HYPNOTISANT 50ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">HYPNOTISANT 50ML L'BEL</h3>
+                    <p class="card-description">Perfume femenino de alta concentración perteneciente a la familia olfativa floral frutal. Misterioso, sofisticado y elegante[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$19.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Hypnotisant%2050ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPTATION 50ML YAMBAL -->
+            <div class="card" data-category="perfumes mujer" data-name="temptation 50ml yambal perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0012907.jpg" alt="TEMPTATION 50ML YAMBAL" class="zoomable" onclick="openModal('img/0012907.jpg', 'TEMPTATION 50ML YAMBAL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">TEMPTATION 50ML YAMBAL</h3>
+                    <p class="card-description">Perfume floral especiado que combina la exuberancia de la rosa búlgara, gardenia y clavo de olor. Un elixir de pura tentación[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$28.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Temptation%2050ml%20Yambal" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DANCING NIGHT 90ML CYZONE -->
+            <div class="card" data-category="perfumes mujer" data-name="dancing night 90ml cyzone perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3509.jpg" alt="DANCING NIGHT 90ML CYZONE" class="zoomable" onclick="openModal('img/3509.jpg', 'DANCING NIGHT 90ML CYZONE')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">DANCING NIGHT 90ML CYZONE</h3>
+                    <p class="card-description">Fragancia femenina de la familia olfativa oriental dulce, diseñada especialmente para destacar en salidas nocturnas y fiestas[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$13.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Dancing%20Night%2090ml%20Cyzone" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIBRANZA LUMINOUS 45ML ESIKA -->
+            <div class="card" data-category="perfumes mujer" data-name="vibranza luminous 45ml esika perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3513.jpg" alt="VIBRANZA LUMINOUS 45ML ESIKA" class="zoomable" onclick="openModal('img/3513.jpg', 'VIBRANZA LUMINOUS 45ML ESIKA')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">VIBRANZA LUMINOUS 45ML ESIKA</h3>
+                    <p class="card-description">Perfume femenino de alta concentración perteneciente a la familia olfativa floral oriental, para la mujer sofisticada, fuerte y sensual[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$21.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Vibranza%20Luminous%2045ml%20Esika" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMARI FREE 50ML AVON -->
+            <div class="card" data-category="perfumes mujer" data-name="imari free 50ml avon perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/7909189357413.jpg" alt="IMARI FREE 50ML AVON" class="zoomable" onclick="openModal('img/7909189357413.jpg', 'IMARI FREE 50ML AVON')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">IMARI FREE 50ML AVON</h3>
+                    <p class="card-description">Fragancia Amaderada Aromática / Floral Chipre. Aroma cítrico, ozónico y muy refrescante, ideal para uso diario[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$11.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Imari%20Free%2050ml%20Avon" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MISS 50ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="miss 50ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3211.jpg" alt="MISS 50ML L'BEL" class="zoomable" onclick="openModal('img/3211.jpg', 'MISS 50ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">MISS 50ML L'BEL</h3>
+                    <p class="card-description">Fragancia femenina de muy alta concentración perteneciente a la familia Floral Frutal, inspirada en la alta perfumería francesa[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$19.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Miss%2050ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VAINILLA SCENT 50ML ESIKA -->
+            <div class="card" data-category="perfumes mujer" data-name="vainilla scent 50ml esika perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3986.jpg" alt="VAINILLA SCENT 50ML ESIKA" class="zoomable" onclick="openModal('img/3986.jpg', 'VAINILLA SCENT 50ML ESIKA')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">VAINILLA SCENT 50ML ESIKA</h3>
+                    <p class="card-description">Aroma sofisticado donde la vainilla se fusiona con resinas, especias, flores y maderas para un estilo elegante y misterioso[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$16.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Vainilla%20Scent%2050ml%20Esika" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DREAM 45ML ESIKA -->
+            <div class="card" data-category="perfumes mujer" data-name="dream 45ml esika perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3711.jpg" alt="DREAM 45ML ESIKA" class="zoomable" onclick="openModal('img/3711.jpg', 'DREAM 45ML ESIKA')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">DREAM 45ML ESIKA</h3>
+                    <p class="card-description">Fragancia femenina de la familia floral frutal para la mujer audaz y llena de energía. Cuenta con tecnología Essent Tech[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$17.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Dream%2045ml%20Esika" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHIC ATTITUDE 50ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="chic attitude 50ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3515.jpg" alt="CHIC ATTITUDE 50ML L'BEL" class="zoomable" onclick="openModal('img/3515.jpg', 'CHIC ATTITUDE 50ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">CHIC ATTITUDE 50ML L'BEL</h3>
+                    <p class="card-description">Fragancia femenina de alta perfumería que destaca por su carácter moderno, sofisticado y vibrante[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$22.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Chic%20Attitude%2050ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MON GOLD 10ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="mon gold 10ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3521.jpg" alt="MON GOLD 10ML L'BEL" class="zoomable" onclick="openModal('img/3521.jpg', 'MON GOLD 10ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">MON GOLD 10ML L'BEL</h3>
+                    <p class="card-description">Perfume floral para mujer de alta concentración y larga duración de la familia olfativa Floral. Contenido: 10ml[cite: 2].</p>
+                    <div class="card-footer">
+                        <span class="price">$8.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Mon%20Gold%2010ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NUEVO: GIRLINK 50ML CYZONE -->
+            <div class="card" data-category="perfumes mujer" data-name="girlink 50ml cyzone perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3511.jpg" alt="GIRLINK 50ML CYZONE" class="zoomable" onclick="openModal('img/3511.jpg', 'GIRLINK 50ML CYZONE')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">GIRLINK 50ML CYZONE</h3>
+                    <p class="card-description">Una de las fragancias femeninas más populares. Destaca por su alta concentración (Eau de Parfum) y larga duración, ideal para uso diario[cite: 3].</p>
+                    <div class="card-footer">
+                        <span class="price">$13.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Girlink%2050ml%20Cyzone" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NUEVO: IN LOVE POTION 50ML CYZONE -->
+            <div class="card" data-category="perfumes mujer" data-name="in love potion 50ml cyzone perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3968.jpg" alt="IN LOVE POTION 50ML CYZONE" class="zoomable" onclick="openModal('img/3968.jpg', 'IN LOVE POTION 50ML CYZONE')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">IN LOVE POTION 50ML CYZONE</h3>
+                    <p class="card-description">Fragancia femenina, seductora y de larga duración, ideal para quienes buscan dejar una huella dulce y envolvente[cite: 3].</p>
+                    <div class="card-footer">
+                        <span class="price">$14.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20In%20Love%20Potion%2050ml%20Cyzone" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NUEVO: ETERNALLY 50ML ESIKA -->
+            <div class="card" data-category="perfumes mujer" data-name="eternally 50ml esika perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3987.jpg" alt="ETERNALLY 50ML ESIKA" class="zoomable" onclick="openModal('img/3987.jpg', 'ETERNALLY 50ML ESIKA')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">ETERNALLY 50ML ESIKA</h3>
+                    <p class="card-description">Fragancia femenina catalogada como oriental dulce frutal, diseñada para reflejar poder, elegancia y sensualidad[cite: 3].</p>
+                    <div class="card-footer">
+                        <span class="price">$18.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Eternally%2050ml%20Esika" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NUEVO: CHERIE 50ML L'BEL -->
+            <div class="card" data-category="perfumes mujer" data-name="cherie 50ml l'bel perfume colonia mujer">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3988.jpg" alt="CHÉRLE 50ML L'BEL" class="zoomable" onclick="openModal('img/3988.jpg', 'CHÉRLE 50ML L\'BEL')">
+                    </div>
+                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header-tags">
+                        <span class="card-badge">Perfumes Mujer</span>
+                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
+                    </div>
+                    <h3 class="card-title">CHÉRLE 50ML L'BEL</h3>
+                    <p class="card-description">Reconocido perfume floral frutal gourmand de alta concentración para mujer, con notas de frambuesa, flores francesas y almizcle[cite: 3].</p>
+                    <div class="card-footer">
+                        <span class="price">$24.99</span>
+                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20Cherie%2050ml%20L'Bel" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRODUCTO TECNOLOGÍA: MOUSE HP -->
             <div class="card" data-category="tecnologia" data-name="mouse inalambrico hp 150 ergonomico raton computacion">
-                <div class="card-img-wrapper" onclick="openModal('img/195161814662.jpg', 'Mouse Inalámbrico HP 150')">
-                    <img src="img/195161814662.jpg" alt="Mouse Inalámbrico HP 150" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/195161814662.jpg" alt="Mouse Inalámbrico HP 150" class="zoomable" onclick="openModal('img/195161814662.jpg', 'Mouse Inalámbrico HP 150')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -430,10 +926,12 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 6: PROTECTOR SOLAR TOTAL BLOCK -->
+            <!-- PRODUCTO PROTECTOR SOLAR: TOTAL BLOCK JUMBO -->
             <div class="card" data-category="protector solar" data-name="protector solar jumbo total block 140g yanbal bloqueador">
-                <div class="card-img-wrapper" onclick="openModal('img/0013517.jpg', 'PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G')">
-                    <img src="img/0013517.jpg" alt="PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013517.jpg" alt="PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G" class="zoomable" onclick="openModal('img/0013517.jpg', 'PROTECTOR SOLAR JUMBO TOTAL BLOCK 140G')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -450,10 +948,12 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 7: PROTECTOR SOLAR KIDS -->
+            <!-- PRODUCTO PROTECTOR SOLAR: TOTAL BLOCK KIDS -->
             <div class="card" data-category="protector solar" data-name="total block protector solar kids spf 100 140g">
-                <div class="card-img-wrapper" onclick="openModal('img/0013520.jpg', 'Total Block Protector Solar Kids SPF 100 140g')">
-                    <img src="img/0013520.jpg" alt="Total Block Protector Solar Kids SPF 100 140g" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013520.jpg" alt="Total Block Protector Solar Kids SPF 100 140g" class="zoomable" onclick="openModal('img/0013520.jpg', 'Total Block Protector Solar Kids SPF 100 140g')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -470,10 +970,12 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 8: PERFUMES HOMBRE (DENDUR) -->
+            <!-- PRODUCTOS PERFUMES HOMBRE -->
             <div class="card" data-category="perfumes hombre" data-name="dendur 75ml yanbal hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/0013697.jpg', 'DENDUR 75ML YAMBAL H')">
-                    <img src="img/0013697.jpg" alt="DENDUR 75ML YAMBAL H" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0013697.jpg" alt="DENDUR 75ML YAMBAL H" class="zoomable" onclick="openModal('img/0013697.jpg', 'DENDUR 75ML YAMBAL H')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -490,10 +992,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 9: PERFUMES HOMBRE (OSADIA LIMITED EDITION) -->
             <div class="card" data-category="perfumes hombre" data-name="osadia limited edition 75ml yanbal hombre perfume">
-                <div class="card-img-wrapper" onclick="openModal('img/0014191.jpg', 'OSADIA LIMITED EDITION 75ML YAMBAL')">
-                    <img src="img/0014191.jpg" alt="OSADIA LIMITED EDITION 75ML YAMBAL" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0014191.jpg" alt="OSADIA LIMITED EDITION 75ML YAMBAL" class="zoomable" onclick="openModal('img/0014191.jpg', 'OSADIA LIMITED EDITION 75ML YAMBAL')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -510,10 +1013,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 10: PERFUMES HOMBRE (ZENTRO) -->
             <div class="card" data-category="perfumes hombre" data-name="zentro 75ml yanbal hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/0012788.jpg', 'ZENTRO 75ML YAMBAL H')">
-                    <img src="img/0012788.jpg" alt="ZENTRO 75ML YAMBAL H" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/0012788.jpg" alt="ZENTRO 75ML YAMBAL H" class="zoomable" onclick="openModal('img/0012788.jpg', 'ZENTRO 75ML YAMBAL H')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -530,10 +1034,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 11: PERFUMES HOMBRE (L'ATTRACTION) -->
             <div class="card" data-category="perfumes hombre" data-name="l'attraction 100ml l'bel hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3503.jpg', 'L´ATTRACTION 100ML L´BEL')">
-                    <img src="img/3503.jpg" alt="L´ATTRACTION 100ML L´BEL" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3503.jpg" alt="L´ATTRACTION 100ML L´BEL" class="zoomable" onclick="openModal('img/3503.jpg', 'L´ATTRACTION 100ML L´BEL')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -550,10 +1055,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 12: PERFUMES HOMBRE (KALOS SPORT) -->
             <div class="card" data-category="perfumes hombre" data-name="kalos sport 100ml esika hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3502.jpg', 'KALOS SPORT 100ML ESIKA')">
-                    <img src="img/3502.jpg" alt="KALOS SPORT 100ML ESIKA" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3502.jpg" alt="KALOS SPORT 100ML ESIKA" class="zoomable" onclick="openModal('img/3502.jpg', 'KALOS SPORT 100ML ESIKA')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -570,10 +1076,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 13: PERFUMES HOMBRE (ALL BLACK) -->
             <div class="card" data-category="perfumes hombre" data-name="all black 90ml cyzone hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3707.jpg', 'ALL BLACK 90ML CYZONE')">
-                    <img src="img/3707.jpg" alt="ALL BLACK 90ML CYZONE" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3707.jpg" alt="ALL BLACK 90ML CYZONE" class="zoomable" onclick="openModal('img/3707.jpg', 'ALL BLACK 90ML CYZONE')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -590,10 +1097,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 14: PERFUMES HOMBRE (D'ORSAY GRAND) -->
             <div class="card" data-category="perfumes hombre" data-name="d'orsay grand 90ml esika hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3969.jpg', 'D´ORSAY GRAND 90ML ESIKA')">
-                    <img src="img/3969.jpg" alt="D´ORSAY GRAND 90ML ESIKA" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3969.jpg" alt="D´ORSAY GRAND 90ML ESIKA" class="zoomable" onclick="openModal('img/3969.jpg', 'D´ORSAY GRAND 90ML ESIKA')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -610,10 +1118,11 @@
                 </div>
             </div>
 
-            <!-- PRODUCTO 15: PERFUMES HOMBRE (BLUE NIGHT) -->
             <div class="card" data-category="perfumes hombre" data-name="blue night 100ml lbel hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3459.jpg', 'BLUE NIGHT 100ML LBEL')">
-                    <img src="img/3459.jpg" alt="BLUE NIGHT 100ML LBEL" class="zoomable">
+                <div class="card-img-wrapper">
+                    <div class="card-gallery-wrapper">
+                        <img src="img/3459.jpg" alt="BLUE NIGHT 100ML LBEL" class="zoomable" onclick="openModal('img/3459.jpg', 'BLUE NIGHT 100ML LBEL')">
+                    </div>
                     <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
                 </div>
                 <div class="card-content">
@@ -624,128 +1133,8 @@
                     <h3 class="card-title">BLUE NIGHT 100ML LBEL</h3>
                     <p class="card-description">Fragancia masculina de alta concentración y familia olfativa herbal maderosa/fresca. Destaca por combinar notas acuáticas y salvia con un fondo cálido de haba tonka.</p>
                     <div class="card-footer">
-                        <span class="price">$24.99</span>
+                        <span class="price">$22.99</span>
                         <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20BLUE%20NIGHT%20100ML%20LBEL" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 16: PERFUMES HOMBRE (FORZE) -->
-            <div class="card" data-category="perfumes hombre" data-name="forze 50ml cyzone hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3967.jpg', 'FORZE 50ML CYZONE')">
-                    <img src="img/3967.jpg" alt="FORZE 50ML CYZONE" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">Perfumes Hombre</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">FORZE 50ML CYZONE</h3>
-                    <p class="card-description">Fragancia masculina de la familia olfativa herbal maderosa/acuática. Destaca por combinar frescura marina con un fondo cálido y versátil para cualquier ocasión.</p>
-                    <div class="card-footer">
-                        <span class="price">$14.99</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20FORZE%2050ML%20CYZONE" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 17: PERFUMES HOMBRE (BLUE INFINITE) -->
-            <div class="card" data-category="perfumes hombre" data-name="blue infinite lbel 100ml hombre perfume colonia">
-                <div class="card-img-wrapper" onclick="openModal('img/3966.jpg', 'BLUE INFINITE LBRL 100ML')">
-                    <img src="img/3966.jpg" alt="BLUE INFINITE LBRL 100ML" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">Perfumes Hombre</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">BLUE INFINITE LBRL 100ML</h3>
-                    <p class="card-description">Fragancia masculina de 100 ml herbal y fresca de alta concentración. Combina la frescura cítrica de la bergamota, el toque del cardamomo y la calidez del sándalo.</p>
-                    <div class="card-footer">
-                        <span class="price">$24.99</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20BLUE%20INFINITE%20LBRL%20100ML" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 18: DULCE AMISTAD -->
-            <div class="card" data-category="perfumes mujer" data-name="dulce amistad 50ml yambal m">
-                <div class="card-img-wrapper" onclick="openModal('img/0013203.jpg', 'DULCE AMISTAD 50ML YAMBAL M')">
-                    <img src="img/0013203.jpg" alt="DULCE AMISTAD 50ML YAMBAL M" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">PERFUMES MUJER</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">DULCE AMISTAD 50ML YAMBAL M</h3>
-                    <p class="card-description">Fragancia femenina de 50 ml. Su aroma combina notas frutales y florales con un fondo dulce de frambuesa, flor de cerezo y helado de vainilla, inspirado en la complicidad y el afecto entre amigas.</p>
-                    <div class="card-footer">
-                        <span class="price">$23.99</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20DULCE%20AMISTAD%2050ML%20YAMBAL%20M" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 19: CIELO -->
-            <div class="card" data-category="perfumes mujer" data-name="cielo 50ml yambal">
-                <div class="card-img-wrapper" onclick="openModal('img/0013641.jpg', 'CIELO 50ML YAMBAL')">
-                    <img src="img/0013641.jpg" alt="CIELO 50ML YAMBAL" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">PERFUMES MUJER</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">CIELO 50ML YAMBAL</h3>
-                    <p class="card-description">El Cielo de Yanbal (50 ml) es un emblemático Eau de Parfum para mujer con un aroma floral ambarado. Combina notas de jazmín, flor de loto fresca y una cálida sensación de musk. Destaca por su alta intensidad y fijación prolongada.</p>
-                    <div class="card-footer">
-                        <span class="price">$27.99</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20CIELO%2050ML%20YAMBAL" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 20: OSADIA ROJO -->
-            <div class="card" data-category="perfumes mujer" data-name="osadia rojo 50ml yambal">
-                <div class="card-img-wrapper" onclick="openModal('img/0013197.jpg', 'OSADIA ROJO 50ML YAMBAL')">
-                    <img src="img/0013197.jpg" alt="OSADIA ROJO 50ML YAMBAL" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">PERFUMES MUJER</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">OSADIA ROJO 50ML YAMBAL</h3>
-                    <p class="card-description">Fragancia femenina de alta intensidad con un aroma floral frutal. Destaca por notas de granada, flor de maracuyá y jengibre, inspirada en la energía, espontaneidad y sensualidad de la mujer latina.</p>
-                    <div class="card-footer">
-                        <span class="price">$27.99.</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20OSADIA%20ROJO%2050ML%20YAMBAL" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PRODUCTO 21: OSADIA LIMITED EDITION -->
-            <div class="card" data-category="perfumes mujer" data-name="osadia limited edition 50ml yambal">
-                <div class="card-img-wrapper" onclick="openModal('img/0014190.jpg', 'OSADIA LIMITED EDITION 50ML YAMBAL')">
-                    <img src="img/0014190.jpg" alt="OSADIA LIMITED EDITION 50ML YAMBAL" class="zoomable">
-                    <div class="zoom-overlay"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
-                </div>
-                <div class="card-content">
-                    <div class="card-header-tags">
-                        <span class="card-badge">PERFUMES MUJER</span>
-                        <span class="stock-badge available"><i class="fa-solid fa-circle-check"></i> Disponible</span>
-                    </div>
-                    <h3 class="card-title">OSADIA LIMITED EDITION 50ML YAMBAL</h3>
-                    <p class="card-description">Fragancia de alta intensidad en versión para mujer (frutal floral de 50 ml con granada, flor de maracuyá y jengibre), pensada para personalidades audaces y modernas.</p>
-                    <div class="card-footer">
-                        <span class="price">$27.99</span>
-                        <a href="https://wa.me/593985282615?text=Hola,%20estoy%20interesado%20en%20el%20OSADIA%20LIMITED%20EDITION%2050ML%20YAMBAL" class="btn-whatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i> Pedir</a>
                     </div>
                 </div>
             </div>
@@ -753,26 +1142,24 @@
         </div>
     </div>
 
-    <!-- VENTANA MODAL PARA AMPLIR IMAGEN CON LA LUPA -->
+    <!-- MODAL DE AMPLIACIÓN DE IMAGEN -->
     <div id="imageModal" class="image-modal" onclick="closeModal()">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <img class="image-modal-content" id="imgExpanded">
+        <img class="image-modal-content" id="modalImg">
         <div id="modalCaption"></div>
     </div>
 
     <footer>
-        <p>&copy; 2026 They & Them Bazar Novedades - Guajaló, Quito</p>
+        <p>&copy; 2026 They & Them Bazar Novedades - Guajaló, Quito, Ecuador.</p>
     </footer>
 
-    <!-- SCRIPT PARA FILTRAR Y MANEJAR EL MODAL/LUPA -->
+    <!-- SCRIPTS DE FILTRADO Y MODAL -->
     <script>
-        // Funciones del Filtro de Categoría
-        function filterCategory(category, buttonElement) {
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            buttonElement.classList.add('active');
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-            const cards = document.querySelectorAll('.grid .card');
+            const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
                 const cardCategory = card.getAttribute('data-category');
                 if (category === 'todos' || cardCategory === category) {
@@ -783,18 +1170,13 @@
             });
         }
 
-        // Funciones de Búsqueda
         function filterProducts() {
-            const input = document.getElementById('searchInput');
-            const filter = input.value.toLowerCase();
-            const cards = document.querySelectorAll('.grid .card');
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
 
             cards.forEach(card => {
-                const name = card.getAttribute('data-name') || '';
-                const title = card.querySelector('.card-title').textContent.toLowerCase();
-                const description = card.querySelector('.card-description').textContent.toLowerCase();
-
-                if (name.includes(filter) || title.includes(filter) || description.includes(filter)) {
+                const name = card.getAttribute('data-name');
+                if (name.includes(input)) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
@@ -802,19 +1184,27 @@
             });
         }
 
-        // Funciones para la Lupa (Abrir y Cerrar Modal de Imagen)
-        function openModal(imageSrc, titleText) {
-            const modal = document.getElementById("imageModal");
-            const modalImg = document.getElementById("imgExpanded");
-            const captionText = document.getElementById("modalCaption");
+        function openModal(imgSrc, captionText) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const caption = document.getElementById('modalCaption');
             
             modal.style.display = "block";
-            modalImg.src = imageSrc;
-            captionText.innerHTML = titleText;
+            modalImg.src = imgSrc;
+            caption.innerHTML = captionText;
         }
 
         function closeModal() {
-            document.getElementById("imageModal").style.display = "none";
+            document.getElementById('imageModal').style.display = "none";
+        }
+
+        function scrollGallery(button, direction) {
+            const wrapper = button.parentElement.querySelector('.card-gallery-wrapper');
+            const scrollAmount = wrapper.clientWidth;
+            wrapper.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
         }
     </script>
 </body>
